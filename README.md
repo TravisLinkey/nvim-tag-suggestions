@@ -21,7 +21,7 @@ Add this to your Neovim configuration:
 
 ```lua
 {
-  "your-username/nvim-tag-suggestions",
+  "TravisLinkey/nvim-tag-suggestions",
   dependencies = {
     "nvim-lua/plenary.nvim",
     "nvim-telescope/telescope.nvim",
@@ -46,7 +46,7 @@ Add this to your Neovim configuration:
 
 ```lua
 use {
-  "your-username/nvim-tag-suggestions",
+  "TravisLinkey/nvim-tag-suggestions",
   requires = {
     "nvim-lua/plenary.nvim",
     "nvim-telescope/telescope.nvim",
