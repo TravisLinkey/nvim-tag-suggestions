@@ -1,0 +1,27 @@
+# Neovim
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+
+# IDE
+.vscode/
+.idea/
+
+# Test files
+test_notes/
+*.test.md
+
+# Environment files
+.env
+.env.local 
