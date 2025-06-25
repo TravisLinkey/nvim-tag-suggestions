@@ -38,94 +38,6 @@ local function get_directory_path(file_path)
   return vim.fn.fnamemodify(file_path, ":h")
 end
 
-local function extract_tags_from_yaml(yaml_content)
-  local tags = {}
-  local lines = vim.split(yaml_content, "\n")
-  local in_tags_section = false
-  
-  for _, line in ipairs(lines) do
-    if line:match("^tags:") then
-      in_tags_section = true
-    elseif in_tags_section and line:match("^%s*-%s+(.+)") then
-      local tag = line:match("^%s*-%s+(.+)")
-      if tag then
-        table.insert(tags, tag)
-      end
-    elseif in_tags_section and not line:match("^%s*-") and line:match("^%s*%w") then
-      -- Exit tags section if we hit another top-level key
-      in_tags_section = false
-    end
-  end
-  
-  return tags
-end
-
-local function read_file_content(file_path)
-  local file = io.open(file_path, "r")
-  if not file then
-    return nil
-  end
-  
-  local content = file:read("*all")
-  file:close()
-  return content
-end
-
-local function get_markdown_files_in_directory(dir_path)
-  local files = {}
-  
-  -- Get files from current directory and subdirectories (recursive)
-  local handle = io.popen(string.format('find "%s" -name "*.md" -type f', dir_path))
-  if handle then
-    for file in handle:lines() do
-      table.insert(files, file)
-    end
-    handle:close()
-  end
-  
-  -- Also get files from parent directories (up to 3 levels up)
-  local current_dir = dir_path
-  for i = 1, 3 do
-    local parent_dir = vim.fn.fnamemodify(current_dir, ":h")
-    if parent_dir ~= current_dir then
-      local parent_handle = io.popen(string.format('find "%s" -maxdepth 1 -name "*.md" -type f', parent_dir))
-      if parent_handle then
-        for file in parent_handle:lines() do
-          table.insert(files, file)
-        end
-        parent_handle:close()
-      end
-      current_dir = parent_dir
-    else
-      break
-    end
-  end
-  
-  return files
-end
-
-local function extract_yaml_frontmatter(content)
-  if not content then return nil end
-  
-  local lines = vim.split(content, "\n")
-  local yaml_lines = {}
-  local in_frontmatter = false
-  
-  for _, line in ipairs(lines) do
-    if line == "---" then
-      if not in_frontmatter then
-        in_frontmatter = true
-      else
-        break
-      end
-    elseif in_frontmatter then
-      table.insert(yaml_lines, line)
-    end
-  end
-  
-  return table.concat(yaml_lines, "\n")
-end
-
 -- Function to format tag as full word with capital letter
 local function format_tag_display(tag)
   -- Common acronyms that should stay all caps
@@ -286,6 +198,94 @@ local function format_tag_display(tag)
     end
     return result
   end
+end
+
+local function extract_tags_from_yaml(yaml_content)
+  local tags = {}
+  local lines = vim.split(yaml_content, "\n")
+  local in_tags_section = false
+  
+  for _, line in ipairs(lines) do
+    if line:match("^tags:") then
+      in_tags_section = true
+    elseif in_tags_section and line:match("^%s*-%s+(.+)") then
+      local tag = line:match("^%s*-%s+(.+)")
+      if tag then
+        table.insert(tags, tag)
+      end
+    elseif in_tags_section and not line:match("^%s*-") and line:match("^%s*%w") then
+      -- Exit tags section if we hit another top-level key
+      in_tags_section = false
+    end
+  end
+  
+  return tags
+end
+
+local function read_file_content(file_path)
+  local file = io.open(file_path, "r")
+  if not file then
+    return nil
+  end
+  
+  local content = file:read("*all")
+  file:close()
+  return content
+end
+
+local function get_markdown_files_in_directory(dir_path)
+  local files = {}
+  
+  -- Get files from current directory and subdirectories (recursive)
+  local handle = io.popen(string.format('find "%s" -name "*.md" -type f', dir_path))
+  if handle then
+    for file in handle:lines() do
+      table.insert(files, file)
+    end
+    handle:close()
+  end
+  
+  -- Also get files from parent directories (up to 3 levels up)
+  local current_dir = dir_path
+  for i = 1, 3 do
+    local parent_dir = vim.fn.fnamemodify(current_dir, ":h")
+    if parent_dir ~= current_dir then
+      local parent_handle = io.popen(string.format('find "%s" -maxdepth 1 -name "*.md" -type f', parent_dir))
+      if parent_handle then
+        for file in parent_handle:lines() do
+          table.insert(files, file)
+        end
+        parent_handle:close()
+      end
+      current_dir = parent_dir
+    else
+      break
+    end
+  end
+  
+  return files
+end
+
+local function extract_yaml_frontmatter(content)
+  if not content then return nil end
+  
+  local lines = vim.split(content, "\n")
+  local yaml_lines = {}
+  local in_frontmatter = false
+  
+  for _, line in ipairs(lines) do
+    if line == "---" then
+      if not in_frontmatter then
+        in_frontmatter = true
+      else
+        break
+      end
+    elseif in_frontmatter then
+      table.insert(yaml_lines, line)
+    end
+  end
+  
+  return table.concat(yaml_lines, "\n")
 end
 
 -- Function to extract keywords from content (simple approach)
@@ -579,9 +579,9 @@ local function show_suggestions_floating(suggestions)
     if i <= config.max_suggestions then
       local source_indicator = suggestion.source == "ai" and "🤖" or "📁"
       if config.show_similarity_scores and suggestion.source == "directory" then
-        table.insert(lines, string.format("  %s %s (freq: %d, sim: %.1f)", source_indicator, format_tag_display(suggestion.tag), suggestion.count, suggestion.similarity))
+        table.insert(lines, string.format("  %s %s (freq: %d, sim: %.1f)", source_indicator, suggestion.tag, suggestion.count, suggestion.similarity))
       else
-        table.insert(lines, string.format("  %s %s", source_indicator, format_tag_display(suggestion.tag)))
+        table.insert(lines, string.format("  %s %s", source_indicator, suggestion.tag))
       end
     end
   end
@@ -606,8 +606,8 @@ local function show_suggestions_floating(suggestions)
     if line > 1 and line <= #suggestions + 1 then
       local suggestion_index = line - 1
       if suggestion_index <= #suggestions then
-        local tag = suggestions[suggestion_index].tag
-        accept_tag(tag)
+        local selection = suggestions[suggestion_index]
+        accept_tag(selection.tag)
       end
     end
   end, opts)
@@ -925,6 +925,12 @@ local function handle_cli_args()
   return false
 end
 
+-- Expose CLI functions
+M.cli_help = show_cli_help
+M.test_ai = test_ai_cli
+M.version = show_version
+M.handle_cli_args = handle_cli_args
+
 -- Setup function
 function M.setup(opts)
   config = vim.tbl_deep_extend("force", default_config, opts or {})
@@ -1037,10 +1043,4 @@ function M.setup(opts)
   end
 end
 
--- Expose CLI functions
-M.cli_help = show_cli_help
-M.test_ai = test_ai_cli
-M.version = show_version
-M.handle_cli_args = handle_cli_args
-
-return M 
+return M

@@ -215,4 +215,4 @@ function M.configure_openai(opts)
   openai_config = vim.tbl_deep_extend("force", openai_config, opts or {})
 end
 
-return M 
+return M
