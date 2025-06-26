@@ -1,7 +1,7 @@
 local M = {}
 
 -- Load AI module
-local ai = require("tag-suggestions.ai")
+local ai = require("nvim-tag-suggestions.ai")
 
 -- Default configuration
 local default_config = {
@@ -789,8 +789,8 @@ Tag Suggestions Plugin - CLI Help
 ================================
 
 USAGE:
-  nvim --headless -c "lua require('tag-suggestions').cli_help()" -c "quit"
-  nvim --headless -c "lua require('tag-suggestions').cli_help()" --help -c "quit"
+  nvim --headless -c "lua require('nvim-tag-suggestions').cli_help()" -c "quit"
+  nvim --headless -c "lua require('nvim-tag-suggestions').cli_help()" --help -c "quit"
 
 COMMANDS:
   --help, -h          Show this help message
@@ -801,16 +801,16 @@ COMMANDS:
 
 EXAMPLES:
   # Show help
-  nvim --headless -c "lua require('tag-suggestions').cli_help()" -c "quit"
+  nvim --headless -c "lua require('nvim-tag-suggestions').cli_help()" -c "quit"
 
   # Test plugin with a specific file
-  nvim --headless test_notes/test_note.md -c "lua require('tag-suggestions').test()" -c "quit"
+  nvim --headless test_notes/test_note.md -c "lua require('nvim-tag-suggestions').test()" -c "quit"
 
   # Debug plugin status
-  nvim --headless -c "lua require('tag-suggestions').debug()" -c "quit"
+  nvim --headless -c "lua require('nvim-tag-suggestions').debug()" -c "quit"
 
   # Test AI suggestions
-  nvim --headless test_notes/test_note.md -c "lua require('tag-suggestions').test_ai()" -c "quit"
+  nvim --headless test_notes/test_note.md -c "lua require('nvim-tag-suggestions').test_ai()" -c "quit"
 
 KEYBINDINGS (when in Neovim):
   <leader>ts          Show all tag suggestions (directory + AI)
@@ -821,7 +821,7 @@ KEYBINDINGS (when in Neovim):
 CONFIGURATION:
   The plugin can be configured in your Neovim config:
   
-  require('tag-suggestions').setup({
+  require('nvim-tag-suggestions').setup({
     trigger_key = "<leader>ts",        -- Key to trigger suggestions
     auto_suggest = false,              -- Auto-suggest when entering tags section
     max_suggestions = 5,               -- Number of suggestions to show
@@ -874,7 +874,7 @@ local function test_ai_cli()
   
   local current_file = get_current_file_path()
   if current_file == "" then
-    print("No file specified. Usage: nvim --headless <file.md> -c \"lua require('tag-suggestions').test_ai()\" -c \"quit\"")
+    print("No file specified. Usage: nvim --headless <file.md> -c \"lua require('nvim-tag-suggestions').test_ai()\" -c \"quit\"")
     return
   end
   
